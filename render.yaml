@@ -1,0 +1,30 @@
+# Render blueprint for the NestJS API.
+#
+# The web app deploys to Vercel separately (see DEPLOYMENT.md) — Vercel's
+# serverless runtime has an ephemeral filesystem and short execution limits,
+# which suit Next.js but not a long-lived Nest process.
+#
+# DATABASE_URL and CORS_ORIGIN are marked sync:false so they are entered in the
+# dashboard rather than committed here.
+
+services:
+  - type: web
+    name: pyramid-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: .
+    buildCommand: npm ci && npm run build -w apps/api && npm run db:deploy
+    startCommand: npm run start -w apps/api
+    healthCheckPath: /api/auth/me
+    envVars:
+      - key: NODE_VERSION
+        value: '20'
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      - key: CORS_ORIGIN
+        sync: false
