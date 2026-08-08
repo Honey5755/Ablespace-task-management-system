@@ -1,0 +1,194 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 ships dark mode as a media query; the design's Change Theme menu
+   is an explicit Light/Dark choice, so rebind the variant to a class on <html>. */
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------------------------------------------------------------------
+   Base palette — shadcn/ui `neutral`, which the Figma captures sample to.
+   Channels are stored bare so Tailwind can compose them with alpha modifiers
+   (e.g. bg-destructive/10 for the "Leave Workspace" button).
+--------------------------------------------------------------------------- */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent-surface: 0 0% 96.1%;
+  --accent-surface-foreground: 0 0% 9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --radius: 0.5rem;
+
+  /* Priority glyph colours, warm → muted, per the Figma dropdown. */
+  --priority-urgent: 0 84% 60%;
+  --priority-high: 25 95% 53%;
+  --priority-medium: 38 92% 50%;
+  --priority-low: 0 0% 63.9%;
+  --priority-none: 0 0% 63.9%;
+
+  /* Overwritten by [data-accent]; `blue` is the design's default. */
+  --accent: 258 90% 66%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 258 90% 66%;
+}
+
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent-surface: 0 0% 14.9%;
+  --accent-surface-foreground: 0 0% 98%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+
+  --priority-urgent: 0 72% 62%;
+  --priority-high: 25 95% 60%;
+  --priority-medium: 38 92% 58%;
+  --priority-low: 0 0% 55%;
+  --priority-none: 0 0% 55%;
+}
+
+/* ---------------------------------------------------------------------------
+   Color Mode (Amber · Blue · Pink · Rose · Emerald · Black).
+
+   The accent tints links, the active nav marker, focus rings and selected
+   states — it deliberately does NOT drive --primary, because every captured
+   frame shows a near-black "+ Add Task" button while "Blue" is the active
+   colour. See README.
+--------------------------------------------------------------------------- */
+[data-accent='amber'] {
+  --accent: 38 92% 50%;
+  --accent-foreground: 0 0% 9%;
+  --ring: 38 92% 50%;
+}
+[data-accent='blue'] {
+  /* Labelled "Blue" in the design; the swatch itself is violet (~#8B5CF6). */
+  --accent: 258 90% 66%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 258 90% 66%;
+}
+[data-accent='pink'] {
+  --accent: 330 81% 60%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 330 81% 60%;
+}
+[data-accent='rose'] {
+  --accent: 347 77% 50%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 347 77% 50%;
+}
+[data-accent='emerald'] {
+  --accent: 160 84% 39%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 160 84% 39%;
+}
+[data-accent='black'] {
+  --accent: 0 0% 9%;
+  --accent-foreground: 0 0% 98%;
+  --ring: 0 0% 9%;
+}
+
+/* "Black" would be invisible on a near-black surface, so it inverts in dark mode. */
+.dark[data-accent='black'] {
+  --accent: 0 0% 98%;
+  --accent-foreground: 0 0% 9%;
+  --ring: 0 0% 83.1%;
+}
+
+/* Expose the tokens to Tailwind's utility generator. */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-surface: hsl(var(--accent-surface));
+  --color-accent-surface-foreground: hsl(var(--accent-surface-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-priority-urgent: hsl(var(--priority-urgent));
+  --color-priority-high: hsl(var(--priority-high));
+  --color-priority-medium: hsl(var(--priority-medium));
+  --color-priority-low: hsl(var(--priority-low));
+  --color-priority-none: hsl(var(--priority-none));
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Only suppress transitions during a theme swap, so component-level
+     transitions elsewhere keep working. */
+  .theme-transitions-off * {
+    transition: none !important;
+  }
+}
+
+@layer utilities {
+  /* Keeps the table's horizontal overflow usable without a visible scrollbar. */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
