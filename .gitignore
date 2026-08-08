@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.next/
+*.tsbuildinfo
+
+# Env — .env.example / .env.local.example are committed
+.env
+.env.local
+
+# SQLite
+*.db
+*.db-journal
+
+# Playwright
+test-results/
+playwright-report/
+.playwright/
+
+.DS_Store
+
+# Design captures are working material, not source
+design/*.png

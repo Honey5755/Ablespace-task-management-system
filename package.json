@@ -1,0 +1,29 @@
+{
+  "name": "ablespace-task-management-system",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "//dev": "run-p, not --workspaces: the latter runs serially and nest --watch never exits, so the web app would never start.",
+    "dev": "run-p --print-label dev:api dev:web",
+    "dev:api": "npm run dev --workspace apps/api",
+    "dev:web": "npm run dev --workspace apps/web",
+    "build": "npm run build --workspaces --if-present",
+    "db:push": "npm run db:push --workspace apps/api",
+    "db:seed": "npm run db:seed --workspace apps/api",
+    "env": "node -e \"const fs=require('fs');for(const [src,dest] of [['apps/api/.env.example','apps/api/.env'],['apps/web/.env.local.example','apps/web/.env.local']]) if(!fs.existsSync(dest)){fs.copyFileSync(src,dest);console.log('created '+dest)}\"",
+    "setup": "npm install && npm run env && npm run db:push && npm run db:seed",
+    "lint": "npm run lint --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "npm-run-all": "^4.1.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
