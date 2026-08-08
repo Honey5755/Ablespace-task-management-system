@@ -1,0 +1,33 @@
+# Netlify config for the Next.js web app.
+#
+# The NestJS API is NOT deployed here — Netlify Functions are serverless, with
+# cold starts and short timeouts that suit Next.js but not a long-lived Nest
+# process holding a database pool. The API goes to Render/Railway; see
+# DEPLOYMENT.md.
+#
+# `base` points at the workspace package. Netlify detects the root
+# package-lock.json and runs a workspace-aware install, so the hoisted
+# node_modules at the repo root resolve correctly.
+
+[build]
+  base = "apps/web"
+  command = "npm run build"
+  # Relative to `base`, i.e. apps/web/.next
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Skip Playwright's browser download — it is only needed for local testing.
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
+
+# The Next.js runtime is built into Netlify and enabled automatically. Pin it
+# explicitly so a future default change cannot silently alter the build.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
