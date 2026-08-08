@@ -148,7 +148,7 @@ perfect, and every action fails silently — the browser console shows
 Open the Netlify URL and walk through:
 
 - [ ] Login screen renders with correct fonts, spacing and the pill buttons
-- [ ] **Continue as Guest** lands on the task list
+- [ ] **Continue as Guest** lands on a **populated** task list, not an empty one
 - [ ] Create a task — it appears in **To Do**
 - [ ] **Reload the page. The task is still there** ← *proves the database persists*
 - [ ] Switch to dark via the sidebar user menu → **Change Theme** → **Dark**
@@ -185,13 +185,16 @@ Netlify does not sleep, so only the API needs this.
 
 ## Optional · Seed the production database
 
-Guests start with an empty workspace by design. To populate the demo account:
+Not needed for the deployed site: **every guest login seeds its own workspace**
+with the design's sample data, so the first screen is already populated.
+
+The demo account is unreachable there anyway — the login card has no email
+field, so guest is the only way in. Seeding it is only useful against a local
+database you intend to browse in Prisma Studio:
 
 ```bash
 DATABASE_URL="<your-neon-pooled-string>" npm run db:seed
 ```
-
-Run from your machine — it writes straight to Neon.
 
 ---
 

@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { LabelsService } from '../labels/labels.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { seedWorkspace } from '../workspace/seed-workspace';
 import type { AuthResponse, JwtPayload, PublicUser } from './auth.types';
 
 /** Friendly display names so each guest session feels like a real account. */
@@ -13,7 +13,6 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
-    private readonly labels: LabelsService,
   ) {}
 
   /**
@@ -31,8 +30,10 @@ export class AuthService {
       },
     });
 
-    // Give the new workspace the label set the design shows on the detail page.
-    await this.labels.seedDefaults(user.id);
+    // Populate the workspace with the drawn sample data, so the first screen is
+    // the design rather than an empty state. Scoped to this user's id, so two
+    // guests still cannot see each other's copies.
+    await seedWorkspace(this.prisma, user.id);
 
     return {
       accessToken: this.jwt.sign({ sub: user.id, isGuest: user.isGuest } satisfies JwtPayload),

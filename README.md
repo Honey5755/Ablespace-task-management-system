@@ -190,6 +190,12 @@ my mistakes from the file's.
 - **Backlog group** — `Backlog` is a real status in the detail rail but isn't one
   of the three groups drawn. Its group renders **only when it holds tasks**, so
   the default view matches the frames exactly while no task can become invisible.
+- **Guest workspaces are seeded** with the sample data from the frames. Guest is
+  the only way into the deployed app, so an unseeded workspace would open on an
+  empty screen and show none of the design being assessed. Each guest gets a
+  private copy scoped to their own id, so isolation is unaffected. Nothing is
+  seeded into `Backlog` — that would put a fourth group on the first screen
+  where the design draws three, and would make the rule above untestable.
 - **Logo** — Figma export was blocked (below), so the mark is redrawn as a vector
   approximation rather than the original asset.
 - **Empty states, loading skeletons and error banners** — not in the design;
@@ -245,12 +251,12 @@ values and vector assets be pulled directly.
 Both apps compile clean (`tsc --noEmit`, `next build`, `nest build`) and lint
 clean (0 errors).
 
-`npm run test:e2e` runs **29 Playwright specs** against a real PostgreSQL
+`npm run test:e2e` runs **30 Playwright specs** against a real PostgreSQL
 database — it boots the API and web app itself, so it works from a clean
 checkout:
 
 ```
-29 passed (18.7s)
+30 passed (26.0s)
 ```
 
 They cover guest login and route guarding, the three task groups and every
@@ -260,9 +266,10 @@ verified through a reload**, subtasks, comments, the activity feed,
 light/dark + all six colour modes persisting independently, profile validation,
 and the mobile drawer plus no-horizontal-overflow assertions.
 
-Two specs pin the design decisions in the deviation table so they can't silently
-regress: `Fields` must list *Members* exactly once, and the task detail page must
-carry exactly one *Subtasks* heading.
+Three specs pin the design decisions in the deviation table so they can't
+silently regress: `Fields` must list *Members* exactly once, the task detail page
+must carry exactly one *Subtasks* heading, and a fresh guest must land on a
+seeded workspace showing exactly the three drawn groups — no `Backlog`.
 
 **Isolation** is covered both ways. `e2e/auth.spec.ts` proves a second browser
 context's guest cannot see the first's tasks; at the API level a second guest

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addTask, loginAsGuest } from './helpers';
+import { addTask, fixture, loginAsGuest } from './helpers';
 
 /**
  * Runs under the `mobile` project (iPhone 13). The Figma has no small-screen
@@ -33,13 +33,14 @@ test.describe('Mobile', () => {
 
   test('table columns fold into a card row instead of scrolling sideways', async ({ page }) => {
     await loginAsGuest(page);
-    await addTask(page, 'Design Homepage', 'High');
+    const title = fixture('Card Row');
+    await addTask(page, title, 'High');
 
     // The desktop column headers stay in the DOM but are suppressed below the
     // sm breakpoint, so assert on visibility rather than presence.
     await expect(page.getByText('Members', { exact: true }).first()).toBeHidden();
     await expect(page.getByText('Due Date', { exact: true }).first()).toBeHidden();
-    await expect(page.getByRole('link', { name: 'Design Homepage' })).toBeVisible();
+    await expect(page.getByRole('link', { name: title })).toBeVisible();
 
     const overflows = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
