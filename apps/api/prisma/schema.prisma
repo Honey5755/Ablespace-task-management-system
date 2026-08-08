@@ -1,0 +1,152 @@
+// Prisma schema — SQLite for zero-setup local evaluation.
+// Swap `provider` to "postgresql" and update DATABASE_URL to move to Postgres;
+// no model changes are required (enums are modelled as validated strings
+// because SQLite has no native enum type).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  // Settings › Profile fields.
+  title     String?
+  username  String?
+  avatarUrl String?
+  isGuest   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks      Task[]     @relation("TaskOwner")
+  assigned   Task[]     @relation("TaskAssignee")
+  projects   Project[]  @relation("ProjectOwner")
+  leading    Project[]  @relation("ProjectLead")
+  labels     Label[]
+  comments   Comment[]
+  activities Activity[]
+
+  @@map("users")
+}
+
+model Project {
+  id       String    @id @default(cuid())
+  name     String
+  priority String    @default("none")
+  dueDate  DateTime?
+  position Int       @default(0)
+
+  ownerId String
+  owner   User   @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  leadId String?
+  lead   User?   @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
+
+  tasks Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId, position])
+  @@map("projects")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  status      String    @default("todo")
+  priority    String    @default("none")
+  dueDate     DateTime?
+  startDate   DateTime?
+  completedAt DateTime?
+  // Ordering slot within a status group.
+  position    Int       @default(0)
+
+  ownerId String
+  owner   User   @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // "Members" in the design. Single-assignee: guest sessions have one member.
+  assigneeId String?
+  assignee   User?   @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Self-relation drives the Subtasks table on the detail page.
+  parentId String?
+  parent   Task?   @relation("Subtasks", fields: [parentId], references: [id], onDelete: Cascade)
+  subtasks Task[]  @relation("Subtasks")
+
+  labels     Label[]    @relation("TaskLabels")
+  comments   Comment[]
+  activities Activity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId, status, position])
+  @@index([parentId])
+  @@map("tasks")
+}
+
+model Label {
+  id   String @id @default(cuid())
+  name String
+  color String @default("neutral")
+  /// Explicit ordering: createMany writes identical createdAt values, so
+  /// sorting by timestamp would not reproduce the chip order in the design.
+  position Int @default(0)
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  tasks Task[] @relation("TaskLabels")
+
+  createdAt DateTime @default(now())
+
+  @@unique([ownerId, name])
+  @@map("labels")
+}
+
+model Comment {
+  id   String @id @default(cuid())
+  body String
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId, createdAt])
+  @@map("comments")
+}
+
+/// Backs the "Updates" feed on the task detail page.
+model Activity {
+  id      String @id @default(cuid())
+  /// e.g. "priority_changed", "status_changed", "created"
+  type    String
+  message String
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  actorId String
+  actor   User   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId, createdAt])
+  @@map("activities")
+}
