@@ -4,6 +4,20 @@ Full-stack task manager built to the provided Figma design.
 **Next.js 15 (App Router) + Tailwind CSS v4** on the front end, **NestJS 10 +
 Prisma + PostgreSQL** on the back end, TypeScript throughout.
 
+## Live
+
+| | |
+| --- | --- |
+| **App** | <https://ablespace-task-management-system.netlify.app> |
+| **API** | <https://pyramid-api-1ph5.onrender.com/api/health> |
+
+Press **Continue as Guest** — no signup. Each guest gets a private workspace,
+seeded with the sample data from the design.
+
+> The API runs on Render's free tier, which sleeps after ~15 minutes idle. The
+> first request after that can take ~50 seconds to wake it; everything is
+> immediate afterwards.
+
 ---
 
 ## Quick start
