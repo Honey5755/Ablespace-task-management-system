@@ -20,7 +20,12 @@ export class ProjectsService {
 
   async findAll(ownerId: string, search?: string): Promise<ProjectWithRelations[]> {
     return this.prisma.project.findMany({
-      where: { ownerId, ...(search ? { name: { contains: search } } : {}) },
+      // Case-insensitive to match the task list's search behaviour; PostgreSQL
+      // LIKE is case-sensitive without this.
+      where: {
+        ownerId,
+        ...(search ? { name: { contains: search, mode: 'insensitive' as const } } : {}),
+      },
       include: PROJECT_INCLUDE,
       orderBy: { position: 'asc' },
     });

@@ -82,6 +82,15 @@ test.describe('Search and filters', () => {
     await expect(page.getByRole('link', { name: 'Develop Login Feature' })).toHaveCount(0);
   });
 
+  test('search is case-insensitive', async ({ page }) => {
+    await page.keyboard.press('ControlOrMeta+f');
+    // Deliberately the wrong case. PostgreSQL LIKE is case-sensitive, so this
+    // fails unless the query sets Prisma's `mode: 'insensitive'`.
+    await page.getByRole('textbox', { name: 'Search tasks' }).fill('dESIGN hOMEPAGE');
+
+    await expect(page.getByRole('link', { name: 'Design Homepage' })).toBeVisible();
+  });
+
   test('a search with no matches offers a way back', async ({ page }) => {
     await page.keyboard.press('ControlOrMeta+f');
     await page.getByRole('textbox', { name: 'Search tasks' }).fill('zzz-no-match');

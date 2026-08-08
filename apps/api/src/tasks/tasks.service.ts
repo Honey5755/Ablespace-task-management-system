@@ -55,11 +55,11 @@ export class TasksService {
     if (!query.includeSubtasks) where.parentId = null;
 
     if (query.search) {
-      // SQLite's LIKE is already case-insensitive for ASCII, so `mode` is omitted
-      // (Prisma rejects `mode: 'insensitive'` on the SQLite connector).
+      // `mode: 'insensitive'` is required on PostgreSQL — unlike SQLite, its
+      // LIKE is case-sensitive, so omitting this silently breaks search.
       where.OR = [
-        { title: { contains: query.search } },
-        { description: { contains: query.search } },
+        { title: { contains: query.search, mode: 'insensitive' } },
+        { description: { contains: query.search, mode: 'insensitive' } },
       ];
     }
 
