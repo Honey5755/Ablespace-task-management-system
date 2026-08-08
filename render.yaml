@@ -1,8 +1,8 @@
 # Render blueprint for the NestJS API.
 #
-# The web app deploys to Vercel separately (see DEPLOYMENT.md) — Vercel's
-# serverless runtime has an ephemeral filesystem and short execution limits,
-# which suit Next.js but not a long-lived Nest process.
+# The web app deploys to Netlify separately (see DEPLOYMENT.md). Netlify's
+# serverless functions have cold starts and short timeouts, which suit Next.js
+# but not a long-lived Nest process holding a database pool.
 #
 # DATABASE_URL and CORS_ORIGIN are marked sync:false so they are entered in the
 # dashboard rather than committed here.

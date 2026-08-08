@@ -21,7 +21,7 @@ Then open <http://localhost:3000> and press **Continue as Guest**.
 Already running Postgres locally? Skip the compose step and point
 `DATABASE_URL` in `apps/api/.env` at your own instance before `npm run setup`.
 
-For the deployed setup — Neon + Render + Vercel — see
+For the deployed setup — Neon + Render + Netlify — see
 [DEPLOYMENT.md](DEPLOYMENT.md).
 
 <details>
