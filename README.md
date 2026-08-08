@@ -84,11 +84,12 @@ apps/
 
 ## API
 
-All routes are under `/api`. Everything except `POST /auth/guest` requires
-`Authorization: Bearer <token>`.
+All routes are under `/api`. Everything except `GET /health` and
+`POST /auth/guest` requires `Authorization: Bearer <token>`.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
+| `GET` | `/health` | Unauthenticated liveness probe for the deploy host |
 | `POST` | `/auth/guest` | Create a guest session, returns JWT + user |
 | `GET` | `/auth/me` | Current profile |
 | `PATCH` | `/users/me` | Update profile (Settings › Profile) |

@@ -16,7 +16,9 @@ services:
     rootDir: .
     buildCommand: npm ci && npm run build -w apps/api && npm run db:deploy
     startCommand: npm run start -w apps/api
-    healthCheckPath: /api/auth/me
+    # Must be an unauthenticated 2xx route: Render treats anything else, 401
+    # included, as unhealthy and fails the deploy.
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
         value: '20'

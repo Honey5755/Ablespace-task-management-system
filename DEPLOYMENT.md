@@ -63,6 +63,9 @@ When it goes live, copy the URL, e.g. `https://pyramid-api.onrender.com`.
 **Verify before continuing:**
 
 ```bash
+curl https://pyramid-api.onrender.com/api/health
+# expect: {"status":"ok","uptime":42}
+
 curl -i https://pyramid-api.onrender.com/api/auth/me
 # expect: HTTP/2 401
 
@@ -71,9 +74,10 @@ curl -X POST https://pyramid-api.onrender.com/api/auth/guest \
 # expect: {"accessToken":"eyJ...","user":{...}}
 ```
 
-A **401 is correct** for the first — it proves the route is mounted and the JWT
-guard is active. If the second returns a token, the database is connected and
-migrated. Don't move on until both work.
+The first is the same route Render's own health check hits. A **401 is correct**
+for the second — it proves the route is mounted and the JWT guard is active. If
+the third returns a token, the database is connected and migrated. Don't move on
+until all three work.
 
 ---
 
@@ -169,8 +173,8 @@ may score it as a non-working URL.
 Pick one:
 
 - **Free uptime pinger** — [cron-job.org](https://cron-job.org) or UptimeRobot,
-  hitting `https://pyramid-api.onrender.com/api/auth/me` every 10 minutes.
-  Cheapest fix; a `401` response still counts as awake.
+  hitting `https://pyramid-api.onrender.com/api/health` every 10 minutes.
+  Cheapest fix, and the endpoint returns `200` so the monitor stays green.
 - **Use Railway or Fly.io for the API instead** — neither sleeps on the free
   tier. The blueprint is Render-specific, but the build and start commands are
   identical.
