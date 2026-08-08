@@ -2,21 +2,27 @@
 
 Full-stack task manager built to the provided Figma design.
 **Next.js 15 (App Router) + Tailwind CSS v4** on the front end, **NestJS 10 +
-Prisma + SQLite** on the back end, TypeScript throughout.
+Prisma + PostgreSQL** on the back end, TypeScript throughout.
 
 ---
 
 ## Quick start
 
+Requires Node 20+ and a PostgreSQL 14+ database.
+
 ```bash
-npm run setup     # install deps, create .env, create the DB, seed demo data
-npm run dev       # API on :4000, web on :3000
+docker compose up -d   # local Postgres on :5432 (skip if you have your own)
+npm run setup          # install deps, write .env, run migrations, seed demo data
+npm run dev            # API on :4000, web on :3000
 ```
 
 Then open <http://localhost:3000> and press **Continue as Guest**.
 
-Requires Node 20+. No Docker, no database server, no external services — SQLite
-is a file on disk.
+Already running Postgres locally? Skip the compose step and point
+`DATABASE_URL` in `apps/api/.env` at your own instance before `npm run setup`.
+
+For the deployed setup — Neon + Render + Vercel — see
+[DEPLOYMENT.md](DEPLOYMENT.md).
 
 <details>
 <summary>Running the two apps separately</summary>
@@ -36,7 +42,8 @@ npm run dev:web   # http://localhost:3000
 | `npm run lint` | ESLint across both workspaces |
 | `npm run test:e2e` | Playwright end-to-end suite (starts its own servers) |
 | `npm run test:e2e:ui` | Same suite in Playwright's UI mode |
-| `npm run db:push` | Sync the Prisma schema to SQLite |
+| `npm run db:deploy` | Apply committed migrations (the production path) |
+| `npm run db:migrate -- --name x` | Create a new migration during development |
 | `npm run db:seed` | Reseed the demo workspace (idempotent) |
 | `npm run db:studio -w apps/api` | Browse the database in Prisma Studio |
 
@@ -216,9 +223,13 @@ values and vector assets be pulled directly.
 
 ## Data model notes
 
-- **SQLite has no enum type**, so `status` and `priority` are validated strings
-  with `TASK_STATUSES` / `TASK_PRIORITIES` as the single source of truth. Moving
-  to Postgres is a one-line `provider` change with no model rewrite.
+- **Status and priority are validated strings, not native Postgres enums.**
+  `TASK_STATUSES` / `TASK_PRIORITIES` in the API are the single source of truth,
+  so adding a value doesn't require a schema migration.
+- **Search sets Prisma's `mode: 'insensitive'`.** PostgreSQL's `LIKE` is
+  case-sensitive, so omitting it silently breaks search — a real regression
+  caught when migrating off SQLite, now pinned by an e2e test that searches in
+  deliberately wrong case.
 - **Priority sorting** ranks `urgent > high > medium > low > none` explicitly;
   ordering by the column would sort alphabetically and put `high` before `low`.
 - **`completedAt` stamps only on the transition** into `completed`, so re-saving
@@ -233,11 +244,12 @@ values and vector assets be pulled directly.
 Both apps compile clean (`tsc --noEmit`, `next build`, `nest build`) and lint
 clean (0 errors).
 
-`npm run test:e2e` runs **28 Playwright specs** — it boots the API and web app
-itself, so it works from a clean checkout:
+`npm run test:e2e` runs **29 Playwright specs** against a real PostgreSQL
+database — it boots the API and web app itself, so it works from a clean
+checkout:
 
 ```
-28 passed (19.0s)
+29 passed (18.7s)
 ```
 
 They cover guest login and route guarding, the three task groups and every
