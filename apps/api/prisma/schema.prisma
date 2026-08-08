@@ -1,14 +1,15 @@
-// Prisma schema — SQLite for zero-setup local evaluation.
-// Swap `provider` to "postgresql" and update DATABASE_URL to move to Postgres;
-// no model changes are required (enums are modelled as validated strings
-// because SQLite has no native enum type).
+// Prisma schema — PostgreSQL.
+//
+// Status and priority stay validated strings rather than native Postgres enums:
+// TASK_STATUSES / TASK_PRIORITIES in the API are the single source of truth, and
+// adding a value there should not require a schema migration.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

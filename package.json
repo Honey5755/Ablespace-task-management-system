@@ -11,10 +11,11 @@
     "dev:api": "npm run dev --workspace apps/api",
     "dev:web": "npm run dev --workspace apps/web",
     "build": "npm run build --workspaces --if-present",
-    "db:push": "npm run db:push --workspace apps/api",
+    "db:deploy": "npm run db:deploy --workspace apps/api",
+    "db:migrate": "npm run db:migrate --workspace apps/api",
     "db:seed": "npm run db:seed --workspace apps/api",
     "env": "node -e \"const fs=require('fs');for(const [src,dest] of [['apps/api/.env.example','apps/api/.env'],['apps/web/.env.local.example','apps/web/.env.local']]) if(!fs.existsSync(dest)){fs.copyFileSync(src,dest);console.log('created '+dest)}\"",
-    "setup": "npm install && npm run env && npm run db:push && npm run db:seed",
+    "setup": "npm install && npm run env && npm run db:deploy && npm run db:seed",
     "lint": "npm run lint --workspaces --if-present",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

@@ -7,10 +7,6 @@ dist/
 .env
 .env.local
 
-# SQLite
-*.db
-*.db-journal
-
 # Playwright
 test-results/
 playwright-report/

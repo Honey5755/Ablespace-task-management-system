@@ -6,7 +6,11 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main",
-    "db:push": "prisma db push",
+    "//postinstall": "Prisma Client must be generated after install on hosts that cache node_modules.",
+    "postinstall": "prisma generate",
+    "//db:deploy": "Applies committed migrations without prompting — the production path.",
+    "db:deploy": "prisma migrate deploy",
+    "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "lint": "eslint \"src/**/*.ts\""
